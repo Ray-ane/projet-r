@@ -11,7 +11,9 @@ require(openintro)
 require(maps)
 
 
-covidus=read.csv("us_states_covid19_daily.csv")
+
+
+covidus=read.csv("/Users/scorpion/Documents/STID/S3/ R Shiny/Projet/data/us_states_covid19_daily.csv")
 
 abb=covidus$state
 
@@ -37,13 +39,14 @@ covid_agg$region=tolower(covid_agg$region)
 
 
 
+
 map.df <- merge(covid_agg,states2, by="region", all.x = T)
 
 
 #### Nombre total de cas positifs aux États-Unis ####
 
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) + 
-  scale_fill_continuous( low = "white", high = "orange", 
+  scale_fill_continuous( low = "white", high = "red", 
                          name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
@@ -56,7 +59,7 @@ plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) +
 #### Nombre total de cas positifs dans l'ouest des États-Unis ####
 
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("CA", "NV", "ID", "OR", "WA")) + 
-  scale_fill_continuous( low = "white", high = "orange", 
+  scale_fill_continuous( low = "white", high = "red", 
                          name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
@@ -70,7 +73,7 @@ plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("CA", 
 ####  Nombre total de cas positifs dans la région nord-est ###
 
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
-  scale_fill_continuous( low = "white", high = "orange", 
+  scale_fill_continuous( low = "white", high = "red", 
                          name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
@@ -83,7 +86,54 @@ plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("PA", 
 
 
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) + 
+  scale_fill_continuous( low = "white", high = "red", 
+                         name = "total_nt", label = scales::comma
+  ) + 
+  theme(legend.position = "right") + 
+  theme(panel.background = element_rect(colour = "black")) + 
+  labs(title = "Not tested cases of Covid19 in US", caption = "Source: @SRK")
+
+-----------------------------------------------------------------------------------------------------
+-------------------------------  #Négatifs  ------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+
+
+#### Nombre total de cas négatifs aux États-Unis ####
+
+plot_usmap(data = map.df, values = "total_neg",   labels=TRUE) + 
   scale_fill_continuous( low = "white", high = "orange", 
+                         name = "Cas négatifs", label = scales::comma
+  ) + 
+  theme(legend.position = "right") + 
+  theme(panel.background = element_rect(colour = "black")) + 
+  labs(title = "Cas négatifs de Covid", caption = "Source: .....")
+
+
+
+#### Nombre total de cas négatifs dans l'ouest des États-Unis ####
+
+plot_usmap(data = map.df, values = "total_neg",   labels=TRUE,include = c("CA", "NV", "ID", "OR", "WA")) + 
+  scale_fill_continuous( low = "white", high = "green", 
+                         name = "Cas négatifs", label = scales::comma
+  ) + 
+  theme(legend.position = "right") + 
+  theme(panel.background = element_rect(colour = "black")) + 
+  labs(title = "Cas négatifs de Covid dans l'ouest des États-Unis", caption = "Source : ....")
+
+
+
+####  Nombre total de cas négatifs dans la région nord-est ###
+
+plot_usmap(data = map.df, values = "total_neg",   labels=TRUE,include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
+  scale_fill_continuous( low = "white", high = "green", 
+                         name = "Cas négatifs", label = scales::comma
+  ) + 
+  theme(legend.position = "right") + 
+  theme(panel.background = element_rect(colour = "black")) + 
+  labs(title = "Cas négatifs de Covid dans le nord-est des États-Unis", caption = "Source: .... ")
+
+plot_usmap(data = map.df, values = "total_neg",   labels=TRUE) + 
+  scale_fill_continuous( low = "white", high = "green", 
                          name = "total_nt", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
@@ -92,7 +142,23 @@ plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) +
 
 
 
+### Sous-ensemble des données pour les États fortement infectés ####
 
+sub_us=subset(covidus2 , subset =(covidus2$state %in% c('MA','TX','WA','CA','FL','CO','NY')))
+
+####  Croissance des patients infectés dans 7 états
+
+p <- ggplot(data = sub_us, aes(x = date, y = negative),color= state)
+
+p + geom_line(aes(group = state)) + facet_wrap(~ state)
+
+
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
+  
+  
+  
 ### Sous-ensemble des données pour les États fortement infectés ####
 
 sub_us=subset(covidus2 , subset =(covidus2$state %in% c('MA','TX','WA','CA','FL','CO','NY')))
