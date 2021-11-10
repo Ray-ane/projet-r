@@ -1,3 +1,7 @@
+#------------------------------------------------------------#
+#                         IMPORTATION                        #
+#------------------------------------------------------------#
+
 library(tidyverse) 
 library(ggplot2)
 library(dplyr)
@@ -7,9 +11,10 @@ require(openintro)
 require(maps)
 
 
-covidus=read.csv("/Users/scorpion/Documents/STID/S3/ R Shiny/Projet/data/us_states_covid19_daily.csv")
+covidus=read.csv("us_states_covid19_daily.csv")
 
 abb=covidus$state
+
 region=abbr2state(abb)
 
 covidus2=cbind(covidus,region)
@@ -17,7 +22,7 @@ covidus2['fips'] <- fips(covidus2$state)
 states=map_data("state")
 
 
-####Aggregating the data ####
+#### Agrégation des données ####
 
 states2=states %>%
   group_by(region) %>%
@@ -30,46 +35,53 @@ covid_agg=covidus2 %>%
             total_nt=sum(pending,na.rm = TRUE))
 covid_agg$region=tolower(covid_agg$region)
 
+
+
 map.df <- merge(covid_agg,states2, by="region", all.x = T)
 
 
-
-####total positive cases in the US ####
+#### Nombre total de cas positifs aux États-Unis ####
 
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) + 
   scale_fill_continuous( low = "white", high = "orange", 
-                         name = "Positive Cases", label = scales::comma
+                         name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
   theme(panel.background = element_rect(colour = "black")) + 
-  labs(title = "Positive cases of Covid", caption = "Source: @SRK")
+  labs(title = "Cas positifs de Covid", caption = "Source: .....")
 
 
 
 
-####total positive cases in West US####
+#### Nombre total de cas positifs dans l'ouest des États-Unis ####
+
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("CA", "NV", "ID", "OR", "WA")) + 
   scale_fill_continuous( low = "white", high = "orange", 
-                         name = "Positive Cases", label = scales::comma
+                         name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
   theme(panel.background = element_rect(colour = "black")) + 
-  labs(title = "Positive cases of Covid in Western US", caption = "Source: @SRK")
+  labs(title = "Cas positifs de Covid dans l'ouest des États-Unis", caption = "Source : ....")
 
 
 
-####total positive cases in northeast region ###
-plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = .northeast_region) + 
+
+
+####  Nombre total de cas positifs dans la région nord-est ###
+
+plot_usmap(data = map.df, values = "total_pos",   labels=TRUE,include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
   scale_fill_continuous( low = "white", high = "orange", 
-                         name = "Positive Cases", label = scales::comma
+                         name = "Cas positive", label = scales::comma
   ) + 
   theme(legend.position = "right") + 
   theme(panel.background = element_rect(colour = "black")) + 
-  labs(title = "Positive cases of Covid in North East US", caption = "Source: @SRK")
+  labs(title = "Cas positifs de Covid dans le nord-est des États-Unis", caption = "Source: .... ")
 
 
 
-####total non treated cases in US####
+
+
+
 plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) + 
   scale_fill_continuous( low = "white", high = "orange", 
                          name = "total_nt", label = scales::comma
@@ -81,14 +93,19 @@ plot_usmap(data = map.df, values = "total_pos",   labels=TRUE) +
 
 
 
-### Subsetting the data for highly infected states ####
+### Sous-ensemble des données pour les États fortement infectés ####
+
 sub_us=subset(covidus2 , subset =(covidus2$state %in% c('MA','TX','WA','CA','FL','CO','NY')))
-####Infected patients growth in 7 states
+
+
+####  Croissance des patients infectés dans 7 états
+
 p <- ggplot(data = sub_us, aes(x = date, y = positive),color= state)
 
 p + geom_line(aes(group = state)) + facet_wrap(~ state)
 
-### death trend in 7 states 
+### Tendance des décès dans 7 états
+
 p <- ggplot(data = sub_us, aes(x = date, y = death))
 
 p + geom_line(aes(group = state)) + facet_wrap(~ state)
