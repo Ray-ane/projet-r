@@ -6,9 +6,10 @@ library(datasets)
 require(usmap)
 require(openintro)
 require(maps)
-library(dashboard)
+library(shinydashboard)
 
-covidus=read.csv("us_states_covid19_daily.csv")
+
+covidus=read.csv("us_states_covid19_daily_2.csv", sep = ";")
 
 abb=covidus$state
 
@@ -29,7 +30,7 @@ states2=states %>%
 covid_agg=covidus2 %>%
     group_by(region,state) %>%
     summarise(total_pos = sum(positive,na.rm = TRUE),total_neg=sum(negative,na.rm = TRUE),
-              total_nt=sum(pending,na.rm = TRUE),
+              total_nt=sum(negative,na.rm = TRUE),
               hospitalized_nt = sum(hospitalized,na.rm = TRUE),
               death_nt = sum(death,na.rm = TRUE))
 covid_agg$region=tolower(covid_agg$region)
@@ -41,71 +42,113 @@ map.df <- merge(covid_agg,states2, by="region", all.x = T)
 
 
 
-ui <- fluidPage(
+ui <- dashboardPage(skin = "green",
+    dashboardHeader(title = "Covid-19 aux États-Unis"),
     
-    titlePanel("Covid-19 aux États-Unis"),
     
-    navbarPage("Covid-19",
-               tabPanel("Positifs",
-                        sidebarLayout(
-                            sidebarPanel(
-                                radioButtons("region_P",
-                                             "Région :",
-                                             choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
-                                             choiceValues = c(1,2,3,4))
-                            ),
-                            
-                            mainPanel(
-                                plotOutput("usmapPlot_pos")
-                            )
+    ## Sidebar content
+    
+    dashboardSidebar(
+        sidebarMenu(
+            menuItem("Positifs", tabName = "Positifs", icon = icon("ok-sign", lib = "glyphicon")),
+            menuItem("Négatifs", tabName = "Négatifs", icon = icon("remove-sign", lib = "glyphicon")),
+            menuItem("Hospitalisations", tabName = "Hospitalisations", icon = icon("tint", lib = "glyphicon")),
+            menuItem("Morts", tabName = "Morts", icon = icon("warning-sign", lib = "glyphicon"))
+        )
+        
+    ),
+    ## Body content
+    
+    dashboardBody(
+        # For all sections
+        tabItems(
+            
+            # section positifs 
+            tabItem(tabName = "Positifs",
+                    h2("Nombre de cas positifs"),
+                    fluidRow(
+                        # A static valueBox
+                        valueBox(sum(covidus$positive,na.rm = TRUE), "Total",color = "red", icon = icon("eye-close", , lib = "glyphicon"))),
+                        
+                    sidebarLayout(
+                        sidebarPanel(
+                            radioButtons("region_P",
+                                         "Région :",
+                                         choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
+                                         choiceValues = c(1,2,3,4))
+                        ),
+                        
+                        mainPanel(
+                            plotOutput("usmapPlot_pos")
                         )
-               ),
-               
-               tabPanel("Négatifs",  
-                        sidebarLayout(
-                            sidebarPanel(
-                                radioButtons("region_N",
-                                             "Région :",
-                                             choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
-                                             choiceValues = c(5,6,7,8))
-                            ),
-                            
-                            mainPanel(
-                                plotOutput("usmapPlot_neg")
-                            )
+                    )
+            ),
+            
+            # section Négatifs 
+            tabItem(tabName = "Négatifs",
+                    h2("Nombre de cas négatifs"),
+                    sidebarLayout(
+                        sidebarPanel(
+                            radioButtons("region_N",
+                                         "Région :",
+                                         choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
+                                         choiceValues = c(5,6,7,8))
+                        ),
+                        
+                        mainPanel(
+                            plotOutput("usmapPlot_neg")
                         )
-               ),
-               tabPanel("Hospitalisations",  
-                        sidebarLayout(
-                            sidebarPanel(
-                                radioButtons("Hosp",
-                                             "Hospitalisations :",
-                                             choiceNames = c("USA", "Nord-Est des USA"),
-                                             choiceValues = c(9,10))
-                            ),
-                            
-                            mainPanel(
-                                plotOutput("usmapPlot_hosp")
-                            )
+                    )
+            ),
+            
+            # section Hospitalisations 
+            tabItem(tabName = "Hospitalisations",
+                    h2("Nombre d'hospitalisations"),
+                    sidebarLayout(
+                        sidebarPanel(
+                            radioButtons("Hosp",
+                                         "Hospitalisations :",
+                                         choiceNames = c("USA","Nord-Est des USA"),
+                                         choiceValues = c(9,10))
+                        ),
+                        
+                        mainPanel(
+                            plotOutput("usmapPlot_hosp")
                         )
-               ),
-               tabPanel("Morts",  
-                        sidebarLayout(
-                            sidebarPanel(
-                                radioButtons("morts",
-                                             "Morts :",
-                                             choiceNames = c("USA", "Nord-Est des USA", "Sud des USA"),
-                                             choiceValues = c(11,12,13))
-                            ),
-                            
-                            mainPanel(
-                                plotOutput("usmapPlot_morts")
-                            )
+                    )
+            ),
+            
+            # section Morts 
+            tabItem(tabName = "Morts",
+                    h2("Nombre de morts"),
+                    sidebarLayout(
+                        sidebarPanel(
+                            radioButtons("morts",
+                                         "Morts :",
+                                         choiceNames = c("USA","Nord-Est des USA", "Sud des USA"),
+                                         choiceValues = c(11,12,13))
+                        ),
+                        
+                        mainPanel(
+                            plotOutput("usmapPlot_morts")
                         )
-               ),
+                    )
+            )
+            
+            
+            
+            
+            
+        )
+        
     )
 )
 
+    
+    
+    
+    
+    
 
 
 server <- function(input, output, session) {
