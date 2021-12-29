@@ -108,8 +108,8 @@ ui <- dashboardPage(skin = "green",
                         sidebarPanel(
                             radioButtons("Hosp",
                                          "Hospitalisations :",
-                                         choiceNames = c("USA","Nord-Est des USA"),
-                                         choiceValues = c(9,10))
+                                         choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
+                                         choiceValues = c(9,10,11,12))
                         ),
                         
                         mainPanel(
@@ -125,8 +125,8 @@ ui <- dashboardPage(skin = "green",
                         sidebarPanel(
                             radioButtons("morts",
                                          "Morts :",
-                                         choiceNames = c("USA","Nord-Est des USA", "Sud des USA"),
-                                         choiceValues = c(11,12,13))
+                                         choiceNames = c("USA","Ouest des USA", "Nord-Est des USA", "Sud des USA"),
+                                         choiceValues = c(13,14,15,16))
                         ),
                         
                         mainPanel(
@@ -218,7 +218,7 @@ server <- function(input, output, session) {
                 ) + 
                 theme(legend.position = "right") + 
                 theme(panel.background = element_rect(colour = "black")) + 
-                labs(title = "Cas négatifs de la Covid-19 dans le nord-est des États-Unis", caption = "Source: .... ")
+                labs(title = "Cas négatifs de la Covid-19 dans le Nord-Est des États-Unis", caption = "Source: .... ")
         }
         else if(input$region_N==8) {
             plot_usmap(data = map.df, values = "total_neg",   labels=TRUE,include = c("TX", "OK", "AR", "LA", "MS" , "AL" , "GA" , "FL")) + 
@@ -242,18 +242,39 @@ server <- function(input, output, session) {
                 labs(title = "Hospitalisations de la Covid-19 aux États-Unis", caption = "Source: @SRK")
         }
         else if(input$Hosp==10) {
+            plot_usmap(data = map.df, values = "hospitalized_nt",   labels=TRUE,include = c("CA", "NV", "ID", "OR", "WA")) + 
+                scale_fill_continuous( low = "white", high = "blue", 
+                                       name = "Hospitalisations", label = scales::comma
+                ) + 
+                theme(legend.position = "right") + 
+                theme(panel.background = element_rect(colour = "black")) + 
+                labs(title = "Hospitalisations de la Covid-19 dans l'ouest des États-Unis", caption = "Source: .... ")
+        }
+        
+        else if(input$Hosp==11) {
             plot_usmap(data = map.df, values = "hospitalized_nt",   labels=TRUE,include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
                 scale_fill_continuous( low = "white", high = "blue", 
                                        name = "Hospitalisations", label = scales::comma
                 ) + 
                 theme(legend.position = "right") + 
                 theme(panel.background = element_rect(colour = "black")) + 
-                labs(title = "Hospitalisations de la Covid-19 dans le nord-est des États-Unis", caption = "Source: .... ")
+                labs(title = "Hospitalisations de la Covid-19 dans le Nord-Est des États-Unis", caption = "Source: .... ")
         }
+        else if(input$Hosp==12) {
+            plot_usmap(data = map.df, values = "hospitalized_nt",   labels=TRUE,include = c("TX", "OK", "AR", "LA", "MS" , "AL" , "GA" , "FL")) + 
+                scale_fill_continuous( low = "white", high = "blue", 
+                                       name = "Hospitalisations", label = scales::comma
+                ) + 
+                theme(legend.position = "right") + 
+                theme(panel.background = element_rect(colour = "black")) + 
+                labs(title = "Hospitalisations de la Covid-19 dans le Sud des États-Unis", caption = "Source: .... ")
+        }
+        
+        
     })
     
     output$usmapPlot_morts <- renderPlot({
-        if(input$morts==11){
+        if(input$morts==13){
             plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
@@ -262,7 +283,16 @@ server <- function(input, output, session) {
                 theme(panel.background = element_rect(colour = "black")) + 
                 labs(title = "Nombre de morts de la Covid-19 aux États-Unis", caption = "Source: @SRK")
         }
-        else if (input$morts==12){
+        else if (input$morts==14){
+            plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE, include = c("CA", "NV", "ID", "OR", "WA")) + 
+                scale_fill_continuous( low = "white", high = "yellow", 
+                                       name = "morts", label = scales::comma
+                ) + 
+                theme(legend.position = "right") + 
+                theme(panel.background = element_rect(colour = "black")) + 
+                labs(title = "Nombre de morts de la Covid-19 dans l'ouest des États-Unis", caption = "Source: @SRK")
+        }
+        else if (input$morts==15){
             plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE, include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
@@ -271,7 +301,7 @@ server <- function(input, output, session) {
                 theme(panel.background = element_rect(colour = "black")) + 
                 labs(title = "Nombre de morts de la Covid-19 dans le Nord-Est des États-Unis", caption = "Source: @SRK")
         }
-        else if (input$morts==13){
+        else if (input$morts==16){
             plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE, include = c("TX", "OK", "AR", "LA", "MS" , "AL" , "GA" , "FL")) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
