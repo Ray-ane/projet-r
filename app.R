@@ -6,6 +6,7 @@ library(datasets)
 require(usmap)
 require(openintro)
 require(maps)
+library(dashboard)
 
 covidus=read.csv("us_states_covid19_daily.csv")
 
@@ -29,7 +30,8 @@ covid_agg=covidus2 %>%
     group_by(region,state) %>%
     summarise(total_pos = sum(positive,na.rm = TRUE),total_neg=sum(negative,na.rm = TRUE),
               total_nt=sum(pending,na.rm = TRUE),
-              hospitalized_nt = sum(hospitalized,na.rm = TRUE))
+              hospitalized_nt = sum(hospitalized,na.rm = TRUE),
+              death_nt = sum(death,na.rm = TRUE))
 covid_agg$region=tolower(covid_agg$region)
 
 
@@ -188,7 +190,7 @@ server <- function(input, output, session) {
     
     output$usmapPlot_hosp <- renderPlot({
         if(input$Hosp==9){
-            plot_usmap(data = covidus, values = "hospitalized" ,   labels=TRUE) + 
+            plot_usmap(data = map.df, values = "hospitalized_nt" ,   labels=TRUE) + 
                 scale_fill_continuous( low = "white", high = "blue", 
                                        name = "Hospitalisations", label = scales::comma
                 ) + 
@@ -209,7 +211,7 @@ server <- function(input, output, session) {
     
     output$usmapPlot_morts <- renderPlot({
         if(input$morts==11){
-            plot_usmap(data = covidus, values = "death" ,   labels=TRUE) + 
+            plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
                 ) + 
@@ -218,7 +220,7 @@ server <- function(input, output, session) {
                 labs(title = "Nombre de morts de la Covid-19 aux États-Unis", caption = "Source: @SRK")
         }
         else if (input$morts==12){
-            plot_usmap(data = covidus, values = "death" ,   labels=TRUE, include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
+            plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE, include = c("PA", "NJ", "CT", "NY", "MA" , "RI" , "VT" , "NH" , "ME")) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
                 ) + 
@@ -227,7 +229,7 @@ server <- function(input, output, session) {
                 labs(title = "Nombre de morts de la Covid-19 dans le Nord-Est des États-Unis", caption = "Source: @SRK")
         }
         else if (input$morts==13){
-            plot_usmap(data = covidus, values = "death" ,   labels=TRUE, include = c("TX", "OK", "AR", "LA", "MS" , "AL" , "GA" , "FL")) + 
+            plot_usmap(data = map.df, values = "death_nt" ,   labels=TRUE, include = c("TX", "OK", "AR", "LA", "MS" , "AL" , "GA" , "FL")) + 
                 scale_fill_continuous( low = "white", high = "yellow", 
                                        name = "morts", label = scales::comma
                 ) + 
